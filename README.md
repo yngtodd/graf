@@ -1,4 +1,4 @@
-<h1>Graf<img src='https://github.com/yngtodd/graf/blob/master/img/snek.png' align='right' width='180' height='104'></h1>
+<h1>Graf<img src='https://github.com/yngtodd/graf/blob/main/img/snek.png' align='right' width='180' height='104'></h1>
 
 
 
