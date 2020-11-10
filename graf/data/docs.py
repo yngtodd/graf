@@ -32,7 +32,6 @@ class DocumentGraphs(Dataset):
         path = Path(self.processed_dir).glob("*.pt")
         return [f.name for f in path]
 
-
     def _load_edge_lists(self, path):
         """load the pickled edge lists
 
