@@ -66,7 +66,6 @@ class DocumentGraphs(Dataset):
                 data, Path(self.processed_dir).joinpath(f"data_{idx}.pt")
             )
 
-
     def len(self):
         return len(self.processed_file_names)
 
