@@ -54,7 +54,11 @@ class DocumentGraphs(Dataset):
         edges = self._load_edge_lists(raw_path)
 
         for idx, edge_index in enumerate(edges):
-            data = Data(edge_index=edge_index)
+            data = Data(
+                edge_index=edge_index,
+                # number of unique nodes in the graph
+                num_nodes=len(torch.unique(edge_index))
+            )
 
             if self.pre_filter is not None and not self.pre_filter(data):
                 continue
