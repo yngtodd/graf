@@ -47,6 +47,9 @@ class DocumentGraphs(Dataset):
 
         return edges
 
+    def _read_raw_data(self, raw_path):
+        """Read in the raw data"""
+
     def process(self):
         # Pytorch geometric keeps this as a list of paths,
         # but we only have only raw graph pickle file
