@@ -16,39 +16,46 @@ class DocumentGraphs(Dataset):
     Args:
         root: root data path
         transform: optional transform applied at load time
-        pre_transform: optional transform when processesing 
+        pre_transform: optional transform when processesing
                        the raw data
     """
 
-    def __init__(self, root, transform=None, pre_transform=None):
+    def __init__(self, root, split="train", transform=None, pre_transform=None):
         super(DocumentGraphs, self).__init__(root, transform, pre_transform)
+        self.check_split(split)
 
-    @property
-    def raw_file_names(self):
-        return ["graph.-1_500.pkl"]
+    def check_split(self, split):
+        if split not in ['train', 'valid', 'test']:
+            raise ValueError(
+                f"Data split must be either `train`, `valid`, or `test`!"
+            )
+
+        self.split = split
 
     @property
     def processed_file_names(self):
         path = Path(self.processed_dir).glob("*.pt")
         return [f.name for f in path]
 
-    def _load_edge_lists(self, path):
-        """load the pickled edge lists
+    def _read_raw_data(self, path):
+        """load the pickled data
 
         Args:
             path: path to graph pickle file
-        
+
         Returns:
             edges: list of torch long tensors,
-                   the edge list for each document graph 
+                   the edge list for each document graph
         """
+        #TODO(TODD): decide how to handle input files
         with open(path, 'rb') as f:
-            edges = pickle.load(f)
+            edges_train = pickle.load(f)
+            y_train = pickle.load(f)
+            edges_valid = pickle.load(f)
+            y_valid = pickle.load(f)
+            edges_test = pickle.load(f)
 
-        return edges
-
-    def _read_raw_data(self, raw_path):
-        """Read in the raw data"""
+        if self.split == "train":
 
     def process(self):
         # Pytorch geometric keeps this as a list of paths,
