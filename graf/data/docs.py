@@ -32,12 +32,14 @@ class DocumentGraphs(InMemoryDataset):
 
     def __init__(self,
                  root,
+                 num_vocab,
                  word_embedding=None,
                  split="train",
                  transform=None,
                  pre_transform=None):
 
         self._check_split(split)
+        self.num_vocab = num_vocab
         self.word_embedding = word_embedding
         super(DocumentGraphs, self).__init__(root, transform, pre_transform)
 
@@ -82,7 +84,7 @@ class DocumentGraphs(InMemoryDataset):
 
     def process(self):
         torch.save(
-            self.process_split('train'), self.processed_paths[0]
+            self.process_split("train"), self.processed_paths[0]
         )
 
     def process_split(self, split):
@@ -94,10 +96,9 @@ class DocumentGraphs(InMemoryDataset):
         data_list = []
         for idx, edge_index in enumerate(edges):
             data = Data(
-                x = None, #self.word_embedding,
+                x = None,
                 edge_index=edge_index,
-                # number of unique nodes in the graph
-                num_nodes=501 # vocab terms
+                num_nodes=self.num_vocab
             )
 
             data_list.append(data)
@@ -108,21 +109,18 @@ class DocumentGraphs(InMemoryDataset):
         if self.pre_transform is not None:
             data_list = [self.pre_transform(d) for d in data_list]
 
-        data = self.collate(data_list)
+        data, slices = self.collate(data_list)
 
-        data[0].x = random_embeddings(501, 30)
-        print(data[0])
-        print(data[0].edge_index)
-        print(data[0].x.shape)
+        data.x = random_embeddings(self.num_vocab, 30)
 
         return data
 
     def len(self):
-        return len(self.processed_file_names)
+        return 1
 
     def get(self, idx):
         data = torch.load(
-            Path(self.processed_dir).joinpath(f"data.pt")
+            Path(self.processed_dir).joinpath(f"{self.split}.pt")
         )
 
         return data
@@ -138,8 +136,9 @@ def random_embeddings(vocab_size, embed_dim):
 if __name__=='__main__':
     from torch_geometric.data import DenseDataLoader
 
-    d = DocumentGraphs('/Users/ygx/data/docs')
-    loader = DenseDataLoader(d, batch_size=32, shuffle=True)
+    d = DocumentGraphs('/Users/ygx/data/docs', num_vocab=501)
+    print(f'data: {d}')
+    loader = DenseDataLoader(d,  batch_size=32, shuffle=True)
 
     for data in loader:
         print(data)
